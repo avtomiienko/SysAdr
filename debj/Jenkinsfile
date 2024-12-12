@@ -1,0 +1,41 @@
+pipeline {
+  agent {
+    docker {
+      image 'ubuntu'
+      args '--privileged --user root'
+    }
+
+  }
+  stages {
+    stage('update') {
+      steps {
+        sh 'apt-get update -y'
+      }
+    }
+
+    stage('wget-install') {
+      steps {
+        sh 'apt-get install wget -y'
+      }
+    }
+
+    stage('package-download') {
+      steps {
+        sh 'wget -P /pkg/ https://github.com/avtomiienko/SysAdr/raw/refs/heads/main/pkgs/count.deb'
+      }
+    }
+
+    stage('package-install') {
+      steps {
+        sh 'dpkg -i /pkg/count.deb'
+      }
+    }
+
+    stage('test') {
+      steps {
+        sh 'count-etc.sh'
+      }
+    }
+
+  }
+}
