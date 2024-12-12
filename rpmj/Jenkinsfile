@@ -1,0 +1,41 @@
+pipeline {
+  agent {
+    docker {
+      image 'fedora:41'
+      args '--privileged --user root'
+    }
+
+  }
+  stages {
+    stage('update') {
+      steps {
+        sh 'dnf update -y'
+      }
+    }
+
+    stage('wget-install') {
+      steps {
+        sh 'dnf install wget -y'
+      }
+    }
+
+    stage('package-download') {
+      steps {
+        sh 'wget -P /pkg/ https://github.com/avtomiienko/SysAdr/raw/refs/heads/main/pkgs/count.rpm'
+      }
+    }
+
+    stage('package-install') {
+      steps {
+        sh 'rpm -ivh /pkg/count.rpm'
+      }
+    }
+
+    stage('test') {
+      steps {
+        sh 'count_etc.sh'
+      }
+    }
+
+  }
+}
